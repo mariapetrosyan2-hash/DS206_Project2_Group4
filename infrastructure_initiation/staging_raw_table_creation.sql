@@ -101,7 +101,7 @@ CREATE TABLE staging_products (
     UnitsInStock INT,
     UnitsOnOrder INT,
     ReorderLevel INT,
-    Discontinued INT
+    Discontinued VARCHAR(10)
 );
 
 -- =========================
