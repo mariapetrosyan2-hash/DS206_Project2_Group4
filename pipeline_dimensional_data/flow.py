@@ -9,83 +9,80 @@ from pipeline_dimensional_data.tasks import (
 )
 
 
-logger = setup_logger()
-
-
 class DimensionalDataFlow:
     def __init__(self):
         self.execution_id = generate_execution_id()
+        self.logger = setup_logger(self.execution_id)
 
     def exec(self, start_date=None, end_date=None):
-        logger.info(f"[{self.execution_id}] Pipeline started")
-        logger.info(f"[{self.execution_id}] Start date: {start_date}, End date: {end_date}")
+        self.logger.info("Pipeline started")
+        self.logger.info(f"Start date: {start_date}, End date: {end_date}")
 
         staging_tables_result = create_staging_tables()
 
         if not staging_tables_result["success"]:
-            logger.error(
-                f"[{self.execution_id}] Pipeline failed at create_staging_tables: "
+            self.logger.error(
+                f"Pipeline failed at create_staging_tables: "
                 f"{staging_tables_result['error']}"
             )
             return staging_tables_result
 
-        logger.info(f"[{self.execution_id}] Staging tables created successfully")
+        self.logger.info("Staging tables created successfully")
 
         dimensional_tables_result = create_dimensional_tables()
 
         if not dimensional_tables_result["success"]:
-            logger.error(
-                f"[{self.execution_id}] Pipeline failed at create_dimensional_tables: "
+            self.logger.error(
+                f"Pipeline failed at create_dimensional_tables: "
                 f"{dimensional_tables_result['error']}"
             )
             return dimensional_tables_result
 
-        logger.info(f"[{self.execution_id}] Dimensional tables created successfully")
+        self.logger.info("Dimensional tables created successfully")
 
         staging_load_result = load_excel_to_staging()
 
         if not staging_load_result["success"]:
-            logger.error(
-                f"[{self.execution_id}] Pipeline failed at load_excel_to_staging: "
+            self.logger.error(
+                f"Pipeline failed at load_excel_to_staging: "
                 f"{staging_load_result['error']}"
             )
             return staging_load_result
 
-        logger.info(f"[{self.execution_id}] Excel data loaded into staging successfully")
+        self.logger.info("Excel data loaded into staging successfully")
 
         dimension_update_result = update_dimension_tables()
 
         if not dimension_update_result["success"]:
-            logger.error(
-                f"[{self.execution_id}] Pipeline failed at update_dimension_tables: "
+            self.logger.error(
+                f"Pipeline failed at update_dimension_tables: "
                 f"{dimension_update_result['error']}"
             )
             return dimension_update_result
 
-        logger.info(f"[{self.execution_id}] Dimension tables updated successfully")
+        self.logger.info("Dimension tables updated successfully")
 
         fact_update_result = update_fact_table(start_date, end_date)
 
         if not fact_update_result["success"]:
-            logger.error(
-                f"[{self.execution_id}] Pipeline failed at update_fact_table: "
+            self.logger.error(
+                f"Pipeline failed at update_fact_table: "
                 f"{fact_update_result['error']}"
             )
             return fact_update_result
 
-        logger.info(f"[{self.execution_id}] Fact table updated successfully")
+        self.logger.info("Fact table updated successfully")
 
         fact_error_update_result = update_fact_error_table(start_date, end_date)
 
         if not fact_error_update_result["success"]:
-            logger.error(
-                f"[{self.execution_id}] Pipeline failed at update_fact_error_table: "
+            self.logger.error(
+                f"Pipeline failed at update_fact_error_table: "
                 f"{fact_error_update_result['error']}"
             )
             return fact_error_update_result
 
-        logger.info(f"[{self.execution_id}] Fact error table updated successfully")
-
-        logger.info(f"[{self.execution_id}] Pipeline completed successfully")
+        self.logger.info("Fact error table updated successfully")
+        self.logger.info("Pipeline completed successfully")
 
         return {"success": True, "execution_id": self.execution_id}
