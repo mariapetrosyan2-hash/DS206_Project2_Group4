@@ -18,7 +18,7 @@ class DimensionalDataFlow:
         self.logger.info("Pipeline started")
         self.logger.info(f"Start date: {start_date}, End date: {end_date}")
 
-        staging_tables_result = create_staging_tables()
+        staging_tables_result = create_staging_tables(self.execution_id)
 
         if not staging_tables_result["success"]:
             self.logger.error(
@@ -29,7 +29,7 @@ class DimensionalDataFlow:
 
         self.logger.info("Staging tables created successfully")
 
-        dimensional_tables_result = create_dimensional_tables()
+        dimensional_tables_result = create_dimensional_tables(self.execution_id)
 
         if not dimensional_tables_result["success"]:
             self.logger.error(
@@ -40,7 +40,7 @@ class DimensionalDataFlow:
 
         self.logger.info("Dimensional tables created successfully")
 
-        staging_load_result = load_excel_to_staging()
+        staging_load_result = load_excel_to_staging(self.execution_id)
 
         if not staging_load_result["success"]:
             self.logger.error(
@@ -51,7 +51,7 @@ class DimensionalDataFlow:
 
         self.logger.info("Excel data loaded into staging successfully")
 
-        dimension_update_result = update_dimension_tables()
+        dimension_update_result = update_dimension_tables(self.execution_id)
 
         if not dimension_update_result["success"]:
             self.logger.error(
@@ -62,7 +62,7 @@ class DimensionalDataFlow:
 
         self.logger.info("Dimension tables updated successfully")
 
-        fact_update_result = update_fact_table(start_date, end_date)
+        fact_update_result = update_fact_table(start_date, end_date, self.execution_id)
 
         if not fact_update_result["success"]:
             self.logger.error(
@@ -73,7 +73,7 @@ class DimensionalDataFlow:
 
         self.logger.info("Fact table updated successfully")
 
-        fact_error_update_result = update_fact_error_table(start_date, end_date)
+        fact_error_update_result = update_fact_error_table(start_date, end_date, self.execution_id)
 
         if not fact_error_update_result["success"]:
             self.logger.error(

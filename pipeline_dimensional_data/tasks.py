@@ -3,10 +3,9 @@ import pandas as pd
 from utils import get_connection, setup_logger, read_sql_file, execute_sql_script
 
 
-logger = setup_logger()
+def run_sql_file(file_path, task_name, execution_id=None):
+    logger = setup_logger(execution_id)
 
-
-def run_sql_file(file_path, task_name):
     try:
         logger.info(f"Starting task: {task_name}")
 
@@ -25,25 +24,26 @@ def run_sql_file(file_path, task_name):
         return {"success": False, "task": task_name, "error": str(e)}
 
 
-def create_staging_tables():
+def create_staging_tables(execution_id=None):
     file_path = os.path.join(
         "infrastructure_initiation",
         "staging_raw_table_creation.sql"
     )
 
-    return run_sql_file(file_path, "create_staging_tables")
+    return run_sql_file(file_path, "create_staging_tables", execution_id)
 
 
-def create_dimensional_tables():
+def create_dimensional_tables(execution_id=None):
     file_path = os.path.join(
         "infrastructure_initiation",
         "dimensional_db_table_creation.sql"
     )
 
-    return run_sql_file(file_path, "create_dimensional_tables")
+    return run_sql_file(file_path, "create_dimensional_tables", execution_id)
 
 
-def update_dimension_tables():
+def update_dimension_tables(execution_id=None):
+    logger = setup_logger(execution_id)
     query_folder = os.path.join("pipeline_dimensional_data", "queries")
 
     dimension_scripts = [
@@ -118,7 +118,8 @@ def update_dimension_tables():
         return {"success": False, "task": "update_dimension_tables", "error": str(e)}
 
 
-def update_fact_table(start_date=None, end_date=None):
+def update_fact_table(start_date=None, end_date=None, execution_id=None):
+    logger = setup_logger(execution_id)
     file_path = os.path.join(
         "pipeline_dimensional_data",
         "queries",
@@ -149,7 +150,8 @@ def update_fact_table(start_date=None, end_date=None):
         return {"success": False, "task": "update_fact_table", "error": str(e)}
 
 
-def update_fact_error_table(start_date=None, end_date=None):
+def update_fact_error_table(start_date=None, end_date=None, execution_id=None):
+    logger = setup_logger(execution_id)
     file_path = os.path.join(
         "pipeline_dimensional_data",
         "queries",
@@ -180,7 +182,8 @@ def update_fact_error_table(start_date=None, end_date=None):
         return {"success": False, "task": "update_fact_error_table", "error": str(e)}
 
 
-def load_excel_to_staging():
+def load_excel_to_staging(execution_id=None):
+    logger = setup_logger(execution_id)
     try:
         logger.info("Starting Excel load process")
 
