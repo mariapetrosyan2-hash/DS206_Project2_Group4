@@ -1,5 +1,10 @@
 from utils import setup_logger, generate_execution_id
-from pipeline_dimensional_data.tasks import load_excel_to_staging
+from pipeline_dimensional_data.tasks import (
+    create_staging_tables,
+    create_dimensional_tables,
+    load_excel_to_staging
+)
+
 
 logger = setup_logger()
 
@@ -12,13 +17,38 @@ class DimensionalDataFlow:
         logger.info(f"[{self.execution_id}] Pipeline started")
         logger.info(f"[{self.execution_id}] Start date: {start_date}, End date: {end_date}")
 
-        staging_result = load_excel_to_staging()
+        staging_tables_result = create_staging_tables()
 
-        if not staging_result["success"]:
-            logger.error(f"[{self.execution_id}] Pipeline failed: {staging_result['error']}")
-            return staging_result
+        if not staging_tables_result["success"]:
+            logger.error(
+                f"[{self.execution_id}] Pipeline failed at create_staging_tables: "
+                f"{staging_tables_result['error']}"
+            )
+            return staging_tables_result
 
-        logger.info(f"[{self.execution_id}] Staging task completed successfully")
+        logger.info(f"[{self.execution_id}] Staging tables created successfully")
+
+        dimensional_tables_result = create_dimensional_tables()
+
+        if not dimensional_tables_result["success"]:
+            logger.error(
+                f"[{self.execution_id}] Pipeline failed at create_dimensional_tables: "
+                f"{dimensional_tables_result['error']}"
+            )
+            return dimensional_tables_result
+
+        logger.info(f"[{self.execution_id}] Dimensional tables created successfully")
+
+        staging_load_result = load_excel_to_staging()
+
+        if not staging_load_result["success"]:
+            logger.error(
+                f"[{self.execution_id}] Pipeline failed at load_excel_to_staging: "
+                f"{staging_load_result['error']}"
+            )
+            return staging_load_result
+
+        logger.info(f"[{self.execution_id}] Excel data loaded into staging successfully")
         logger.info(f"[{self.execution_id}] Pipeline completed successfully")
 
         return {"success": True, "execution_id": self.execution_id}
