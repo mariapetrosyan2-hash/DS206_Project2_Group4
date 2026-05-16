@@ -92,6 +92,11 @@ def update_fact_table(start_date=None, end_date=None):
         connection = get_connection()
         sql_script = read_sql_file(file_path)
 
+        sql_script = sql_script.format(
+            start_date=start_date,
+            end_date=end_date
+        )
+
         logger.info("Executing fact update script")
         execute_sql_script(connection, sql_script)
 
@@ -117,6 +122,11 @@ def update_fact_error_table(start_date=None, end_date=None):
 
         connection = get_connection()
         sql_script = read_sql_file(file_path)
+
+        sql_script = sql_script.format(
+            start_date=start_date,
+            end_date=end_date
+        )
 
         logger.info("Executing fact error update script")
         execute_sql_script(connection, sql_script)
