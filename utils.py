@@ -26,7 +26,9 @@ def parse_sql_server_config(config_path):
     return {
         "server": config["sql_server"]["server"],
         "database": config["sql_server"]["database"],
-        "driver": config["sql_server"]["driver"]
+        "driver": config["sql_server"]["driver"],
+        "username": config["sql_server"]["username"],
+        "password": config["sql_server"]["password"]
     }
 
 
@@ -46,12 +48,16 @@ def get_connection():
     server = db_config["server"]
     database = db_config["database"]
     driver = db_config["driver"]
+    username = db_config["username"]
+    password = db_config["password"]
 
     connection = pyodbc.connect(
-        f"DRIVER={{{driver}}};"
-        f"SERVER={server};"
-        f"DATABASE={database};"
-        f"Trusted_Connection=yes;"
+    f"DRIVER={{{driver}}};"
+    f"SERVER={server};"
+    f"DATABASE={database};"
+    f"UID={username};"
+    f"PWD={password};"
+    f"TrustServerCertificate=yes;"
     )
 
     return connection
