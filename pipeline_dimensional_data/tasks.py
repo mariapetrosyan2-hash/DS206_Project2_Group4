@@ -1,8 +1,46 @@
+import os
 import pandas as pd
-from utils import get_connection, setup_logger
+from utils import get_connection, setup_logger, read_sql_file, execute_sql_script
 
 
 logger = setup_logger()
+
+
+def run_sql_file(file_path, task_name):
+    try:
+        logger.info(f"Starting task: {task_name}")
+
+        connection = get_connection()
+        sql_script = read_sql_file(file_path)
+
+        result = execute_sql_script(connection, sql_script)
+
+        connection.close()
+
+        logger.info(f"Completed task: {task_name}")
+        return {"success": True, "task": task_name, "result": result}
+
+    except Exception as e:
+        logger.error(f"Error in task {task_name}: {e}")
+        return {"success": False, "task": task_name, "error": str(e)}
+
+
+def create_staging_tables():
+    file_path = os.path.join(
+        "infrastructure_initiation",
+        "staging_raw_table_creation.sql"
+    )
+
+    return run_sql_file(file_path, "create_staging_tables")
+
+
+def create_dimensional_tables():
+    file_path = os.path.join(
+        "infrastructure_initiation",
+        "dimensional_db_table_creation.sql"
+    )
+
+    return run_sql_file(file_path, "create_dimensional_tables")
 
 
 def load_excel_to_staging():
