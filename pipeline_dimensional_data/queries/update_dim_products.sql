@@ -1,16 +1,16 @@
-USE ORDER_DDS;
+USE {database_name};
 
 -- Close changed current product records
 UPDATE target
 SET
     target.end_date = GETDATE(),
     target.is_current = 0
-FROM dbo.DimProducts target
-INNER JOIN dbo.staging_products source
+FROM {schema_name}.{dimension_table} target
+INNER JOIN {schema_name}.{staging_table} source
     ON target.ProductID_NK = source.ProductID
-LEFT JOIN dbo.DimSuppliers sup
+LEFT JOIN {schema_name}.DimSuppliers sup
     ON sup.SupplierID_NK = source.SupplierID
-LEFT JOIN dbo.DimCategories cat
+LEFT JOIN {schema_name}.DimCategories cat
     ON cat.CategoryID_NK = source.CategoryID
 WHERE target.is_current = 1
   AND target.is_deleted = 0
@@ -27,7 +27,7 @@ WHERE target.is_current = 1
   );
 
 -- Insert new products or new current versions after changes
-INSERT INTO dbo.DimProducts (
+INSERT INTO {schema_name}.{dimension_table} (
     ProductID_NK,
     ProductName,
     SupplierID_SK,
@@ -62,14 +62,14 @@ SELECT
     0,
     sor.SOR_SK,
     source.staging_raw_id_sk
-FROM dbo.staging_products source
-INNER JOIN dbo.Dim_SOR sor
+FROM {schema_name}.{staging_table} source
+INNER JOIN {schema_name}.Dim_SOR sor
     ON sor.SOR_Name = 'Products'
-LEFT JOIN dbo.DimSuppliers sup
+LEFT JOIN {schema_name}.DimSuppliers sup
     ON sup.SupplierID_NK = source.SupplierID
-LEFT JOIN dbo.DimCategories cat
+LEFT JOIN {schema_name}.DimCategories cat
     ON cat.CategoryID_NK = source.CategoryID
-LEFT JOIN dbo.DimProducts current_target
+LEFT JOIN {schema_name}.{dimension_table} current_target
     ON current_target.ProductID_NK = source.ProductID
    AND current_target.is_current = 1
    AND current_target.is_deleted = 0
@@ -81,8 +81,8 @@ SET
     target.end_date = GETDATE(),
     target.is_current = 0,
     target.is_deleted = 1
-FROM dbo.DimProducts target
-LEFT JOIN dbo.staging_products source
+FROM {schema_name}.{dimension_table} target
+LEFT JOIN {schema_name}.{staging_table} source
     ON target.ProductID_NK = source.ProductID
 WHERE source.ProductID IS NULL
   AND target.is_current = 1

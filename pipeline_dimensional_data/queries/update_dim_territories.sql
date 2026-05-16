@@ -1,8 +1,7 @@
-USE ORDER_DDS;
-GO
+USE {database_name};
 
 -- Insert new territories into the main SCD4 current table
-INSERT INTO dbo.DimTerritories (
+INSERT INTO {schema_name}.{dimension_table} (
     TerritoryID_NK,
     TerritoryDescription,
     TerritoryCode,
@@ -17,12 +16,12 @@ SELECT
     region.RegionID_SK,
     sor.SOR_SK,
     source.staging_raw_id_sk
-FROM dbo.staging_territories source
-INNER JOIN dbo.Dim_SOR sor
+FROM {schema_name}.{staging_table} source
+INNER JOIN {schema_name}.Dim_SOR sor
     ON sor.SOR_Name = 'Territories'
-LEFT JOIN dbo.DimRegion region
+LEFT JOIN {schema_name}.DimRegion region
     ON region.RegionID_NK = source.RegionID
-LEFT JOIN dbo.DimTerritories target
+LEFT JOIN {schema_name}.{dimension_table} target
     ON target.TerritoryID_NK = source.TerritoryID
 WHERE target.TerritoryID_SK IS NULL;
 
@@ -31,12 +30,12 @@ UPDATE history
 SET
     history.end_date = GETDATE(),
     history.is_current = 0
-FROM dbo.DimTerritories_History history
-INNER JOIN dbo.DimTerritories dim
+FROM {schema_name}.DimTerritories_History history
+INNER JOIN {schema_name}.{dimension_table} dim
     ON history.TerritoryID_SK = dim.TerritoryID_SK
-INNER JOIN dbo.staging_territories source
+INNER JOIN {schema_name}.{staging_table} source
     ON dim.TerritoryID_NK = source.TerritoryID
-LEFT JOIN dbo.DimRegion region
+LEFT JOIN {schema_name}.DimRegion region
     ON region.RegionID_NK = source.RegionID
 WHERE history.is_current = 1
   AND (
@@ -53,16 +52,16 @@ SET
     target.RegionID_SK = region.RegionID_SK,
     target.SOR_SK = sor.SOR_SK,
     target.staging_raw_id = source.staging_raw_id_sk
-FROM dbo.DimTerritories target
-INNER JOIN dbo.staging_territories source
+FROM {schema_name}.{dimension_table} target
+INNER JOIN {schema_name}.{staging_table} source
     ON target.TerritoryID_NK = source.TerritoryID
-INNER JOIN dbo.Dim_SOR sor
+INNER JOIN {schema_name}.Dim_SOR sor
     ON sor.SOR_Name = 'Territories'
-LEFT JOIN dbo.DimRegion region
+LEFT JOIN {schema_name}.DimRegion region
     ON region.RegionID_NK = source.RegionID;
 
 -- Insert new current history rows
-INSERT INTO dbo.DimTerritories_History (
+INSERT INTO {schema_name}.DimTerritories_History (
     TerritoryID_SK,
     TerritoryID_NK,
     TerritoryDescription,
@@ -85,8 +84,8 @@ SELECT
     1,
     dim.SOR_SK,
     dim.staging_raw_id
-FROM dbo.DimTerritories dim
-LEFT JOIN dbo.DimTerritories_History history
+FROM {schema_name}.{dimension_table} dim
+LEFT JOIN {schema_name}.DimTerritories_History history
     ON history.TerritoryID_SK = dim.TerritoryID_SK
    AND history.is_current = 1
 WHERE history.TerritoryHistory_SK IS NULL;

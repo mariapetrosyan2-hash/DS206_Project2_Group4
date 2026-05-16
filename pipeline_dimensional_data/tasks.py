@@ -47,14 +47,46 @@ def update_dimension_tables():
     query_folder = os.path.join("pipeline_dimensional_data", "queries")
 
     dimension_scripts = [
-        "update_dim_categories.sql",
-        "update_dim_customers.sql",
-        "update_dim_employees.sql",
-        "update_dim_region.sql",
-        "update_dim_suppliers.sql",
-        "update_dim_shippers.sql",
-        "update_dim_territories.sql",
-        "update_dim_products.sql"
+        {
+            "script": "update_dim_categories.sql",
+            "dimension_table": "DimCategories",
+            "staging_table": "staging_categories"
+        },
+        {
+            "script": "update_dim_customers.sql",
+            "dimension_table": "DimCustomers",
+            "staging_table": "staging_customers"
+        },
+        {
+            "script": "update_dim_employees.sql",
+            "dimension_table": "DimEmployees",
+            "staging_table": "staging_employees"
+        },
+        {
+            "script": "update_dim_region.sql",
+            "dimension_table": "DimRegion",
+            "staging_table": "staging_region"
+        },
+        {
+            "script": "update_dim_suppliers.sql",
+            "dimension_table": "DimSuppliers",
+            "staging_table": "staging_suppliers"
+        },
+        {
+            "script": "update_dim_shippers.sql",
+            "dimension_table": "DimShippers",
+            "staging_table": "staging_shippers"
+        },
+        {
+            "script": "update_dim_territories.sql",
+            "dimension_table": "DimTerritories",
+            "staging_table": "staging_territories"
+        },
+        {
+            "script": "update_dim_products.sql",
+            "dimension_table": "DimProducts",
+            "staging_table": "staging_products"
+        }
     ]
 
     try:
@@ -62,11 +94,18 @@ def update_dimension_tables():
 
         connection = get_connection()
 
-        for script_name in dimension_scripts:
-            file_path = os.path.join(query_folder, script_name)
+        for script_config in dimension_scripts:
+            file_path = os.path.join(query_folder, script_config["script"])
             sql_script = read_sql_file(file_path)
 
-            logger.info(f"Executing dimension update script: {script_name}")
+            sql_script = sql_script.format(
+                database_name="ORDER_DDS",
+                schema_name="dbo",
+                dimension_table=script_config["dimension_table"],
+                staging_table=script_config["staging_table"]
+            )
+
+            logger.info(f"Executing dimension update script: {script_config['script']}")
             execute_sql_script(connection, sql_script)
 
         connection.close()
@@ -108,7 +147,7 @@ def update_fact_table(start_date=None, end_date=None):
     except Exception as e:
         logger.error(f"Error updating fact table: {e}")
         return {"success": False, "task": "update_fact_table", "error": str(e)}
-    
+
 
 def update_fact_error_table(start_date=None, end_date=None):
     file_path = os.path.join(

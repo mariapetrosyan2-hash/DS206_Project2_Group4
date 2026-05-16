@@ -1,6 +1,6 @@
-USE ORDER_DDS;
+USE {database_name};
 
-MERGE dbo.DimEmployees AS target
+MERGE {schema_name}.{dimension_table} AS target
 USING (
     SELECT
         e.EmployeeID AS EmployeeID_NK,
@@ -22,8 +22,8 @@ USING (
         e.PhotoPath,
         sor.SOR_SK,
         e.staging_raw_id_sk AS staging_raw_id
-    FROM dbo.staging_employees e
-    INNER JOIN dbo.Dim_SOR sor
+    FROM {schema_name}.{staging_table} e
+    INNER JOIN {schema_name}.Dim_SOR sor
         ON sor.SOR_Name = 'Employees'
     WHERE e.EmployeeID IS NOT NULL
 ) AS source
