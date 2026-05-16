@@ -1,6 +1,6 @@
-USE ORDER_DDS;
+USE {database_name};
 
-MERGE dbo.DimShippers AS target
+MERGE {schema_name}.{dimension_table} AS target
 USING (
     SELECT
         s.ShipperID AS ShipperID_NK,
@@ -8,8 +8,8 @@ USING (
         s.Phone,
         sor.SOR_SK,
         s.staging_raw_id_sk AS staging_raw_id
-    FROM dbo.staging_shippers s
-    INNER JOIN dbo.Dim_SOR sor
+    FROM {schema_name}.{staging_table} s
+    INNER JOIN {schema_name}.Dim_SOR sor
         ON sor.SOR_Name = 'Shippers'
 ) AS source
 ON target.ShipperID_NK = source.ShipperID_NK

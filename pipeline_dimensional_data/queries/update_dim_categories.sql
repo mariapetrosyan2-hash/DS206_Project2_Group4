@@ -1,6 +1,6 @@
-USE ORDER_DDS;
+USE {database_name};
 
-MERGE dbo.DimCategories AS target
+MERGE {schema_name}.{dimension_table} AS target
 USING (
     SELECT
         c.CategoryID AS CategoryID_NK,
@@ -8,8 +8,8 @@ USING (
         c.Description,
         sor.SOR_SK,
         c.staging_raw_id_sk AS staging_raw_id
-    FROM dbo.staging_categories c
-    INNER JOIN dbo.Dim_SOR sor
+    FROM {schema_name}.{staging_table} c
+    INNER JOIN {schema_name}.Dim_SOR sor
         ON sor.SOR_Name = 'Categories'
 ) AS source
 ON target.CategoryID_NK = source.CategoryID_NK

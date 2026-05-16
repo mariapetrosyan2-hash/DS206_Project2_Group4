@@ -1,8 +1,7 @@
-USE ORDER_DDS;
-GO
+USE {database_name};
 
 -- Insert new regions into the main SCD4 current table
-INSERT INTO dbo.DimRegion (
+INSERT INTO {schema_name}.{dimension_table} (
     RegionID_NK,
     RegionDescription,
     RegionCategory,
@@ -17,10 +16,10 @@ SELECT
     source.RegionImportance,
     sor.SOR_SK,
     source.staging_raw_id_sk
-FROM dbo.staging_region source
-INNER JOIN dbo.Dim_SOR sor
+FROM {schema_name}.{staging_table} source
+INNER JOIN {schema_name}.Dim_SOR sor
     ON sor.SOR_Name = 'Region'
-LEFT JOIN dbo.DimRegion target
+LEFT JOIN {schema_name}.{dimension_table} target
     ON target.RegionID_NK = source.RegionID
 WHERE target.RegionID_SK IS NULL;
 
@@ -29,10 +28,10 @@ UPDATE history
 SET
     history.end_date = GETDATE(),
     history.is_current = 0
-FROM dbo.DimRegion_History history
-INNER JOIN dbo.DimRegion dim
+FROM {schema_name}.DimRegion_History history
+INNER JOIN {schema_name}.{dimension_table} dim
     ON history.RegionID_SK = dim.RegionID_SK
-INNER JOIN dbo.staging_region source
+INNER JOIN {schema_name}.{staging_table} source
     ON dim.RegionID_NK = source.RegionID
 WHERE history.is_current = 1
   AND (
@@ -49,14 +48,14 @@ SET
     target.RegionImportance = source.RegionImportance,
     target.SOR_SK = sor.SOR_SK,
     target.staging_raw_id = source.staging_raw_id_sk
-FROM dbo.DimRegion target
-INNER JOIN dbo.staging_region source
+FROM {schema_name}.{dimension_table} target
+INNER JOIN {schema_name}.{staging_table} source
     ON target.RegionID_NK = source.RegionID
-INNER JOIN dbo.Dim_SOR sor
-    ON sor.SOR_Name = 'staging_region';
+INNER JOIN {schema_name}.Dim_SOR sor
+    ON sor.SOR_Name = 'Region';
 
 -- Insert new current history rows
-INSERT INTO dbo.DimRegion_History (
+INSERT INTO {schema_name}.DimRegion_History (
     RegionID_SK,
     RegionID_NK,
     RegionDescription,
@@ -79,8 +78,8 @@ SELECT
     1,
     dim.SOR_SK,
     dim.staging_raw_id
-FROM dbo.DimRegion dim
-LEFT JOIN dbo.DimRegion_History history
+FROM {schema_name}.{dimension_table} dim
+LEFT JOIN {schema_name}.DimRegion_History history
     ON history.RegionID_SK = dim.RegionID_SK
    AND history.is_current = 1
 WHERE history.RegionHistory_SK IS NULL;

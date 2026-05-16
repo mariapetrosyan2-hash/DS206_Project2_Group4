@@ -1,12 +1,12 @@
-USE ORDER_DDS;
+USE {database_name};
 
 -- Close old current records when customer attributes changed
 UPDATE target
 SET
     target.end_date = GETDATE(),
     target.is_current = 0
-FROM dbo.DimCustomers target
-INNER JOIN dbo.staging_customers source
+FROM {schema_name}.{dimension_table} target
+INNER JOIN {schema_name}.{staging_table} source
     ON target.CustomerID_NK = source.CustomerID
 WHERE target.is_current = 1
   AND (
@@ -23,7 +23,7 @@ WHERE target.is_current = 1
   );
 
 -- Insert new customers or new current versions after change
-INSERT INTO dbo.DimCustomers (
+INSERT INTO {schema_name}.{dimension_table} (
     CustomerID_NK,
     CompanyName,
     ContactName,
@@ -58,10 +58,10 @@ SELECT
     1 AS is_current,
     sor.SOR_SK,
     source.staging_raw_id_sk AS staging_raw_id
-FROM dbo.staging_customers source
-INNER JOIN dbo.Dim_SOR sor
+FROM {schema_name}.{staging_table} source
+INNER JOIN {schema_name}.Dim_SOR sor
     ON sor.SOR_Name = 'Customers'
-LEFT JOIN dbo.DimCustomers current_target
+LEFT JOIN {schema_name}.{dimension_table} current_target
     ON current_target.CustomerID_NK = source.CustomerID
    AND current_target.is_current = 1
 WHERE current_target.CustomerID_SK IS NULL;
