@@ -166,14 +166,63 @@ Each task returns a success/error dictionary. If a task fails, the pipeline stop
 
 ---
 
-## How to Run the Pipeline
+## How to Initialize and Run the Pipeline
 
-Run the pipeline from the project root folder.
+Before running the Python pipeline, the dimensional database must exist in SQL Server.
 
-Example:
+### Step 1: Create the Database
+
+First, run the following SQL script in SQL Server, DBeaver, or SSMS:
+
+```text
+infrastructure_initiation/dimensional_database_creation.sql
+```
+
+This script creates the empty database:
+
+```text
+ORDER_DDS
+```
+
+If `ORDER_DDS` already exists, the script drops and recreates it, so it should be used when you want a clean database reset.
+
+### Step 2: Check the SQL Server Configuration
+
+Database connection settings are stored in:
+
+```text
+infrastructure_initiation/sql_server_config.cfg
+```
+
+Make sure the server, database, driver, and authentication settings match your local SQL Server setup.
+
+Example for SQL Server Authentication:
+
+```cfg
+[sql_server]
+server = localhost,1433
+database = ORDER_DDS
+driver = ODBC Driver 18 for SQL Server
+username = sa
+password = YOUR_PASSWORD
+```
+
+Example for Windows Trusted Connection:
+
+```cfg
+[sql_server]
+server = localhost\SQLEXPRESS
+database = ORDER_DDS
+driver = ODBC Driver 17 for SQL Server
+trusted_connection = yes
+```
+
+### Step 3: Run the Python Pipeline
+
+Run the pipeline from the project root folder:
 
 ```bash
-python main.py --start_date=2026-01-01 --end_date=2026-12-31
+python main.py --start_date=1996-01-01 --end_date=1999-01-01
 ```
 
 The command-line arguments are:
@@ -182,6 +231,12 @@ The command-line arguments are:
 - `--end_date`: end date for fact table ingestion.
 
 These parameters are passed into `update_fact.sql` and `update_fact_error.sql`.
+
+For the provided Northwind-style dataset, the recommended date range is:
+
+```text
+1996-01-01 to 1999-01-01
+```
 
 ---
 
@@ -202,7 +257,6 @@ database = ORDER_DDS
 driver = ODBC Driver 17 for SQL Server
 ```
 
-Do not store real passwords or sensitive credentials in the repository.
 
 ---
 
@@ -329,49 +383,6 @@ The tests cover:
 - Successful mocked SQL Server connection
 - Missing SQL Server configuration section
 - Database connection failure handling
-
----
-
-## Power BI Dashboard
-
-The Power BI dashboard file should be stored in:
-
-```text
-dashboard/
-```
-
-The dashboard is intended to analyze business performance across:
-
-- Sales
-- Products
-- Categories
-- Customers
-- Countries
-- Employees
-- Shippers
-- Regions
-
-Suggested dashboard pages include:
-
-1. Executive Overview
-2. Product and Category Analysis
-3. Customer and Geography Analysis
-4. Employee and Shipping Performance
-
----
-
-## Main Business Questions
-
-The BI dashboard can answer questions such as:
-
-1. What is the total sales revenue?
-2. Which product categories generate the most revenue?
-3. Which products are the top sellers?
-4. Which customers contribute most to sales?
-5. Which countries or regions generate the most orders?
-6. Which employees are responsible for the highest sales volume?
-7. Which shippers are used most frequently?
-8. How do sales change over time?
 
 ---
 
