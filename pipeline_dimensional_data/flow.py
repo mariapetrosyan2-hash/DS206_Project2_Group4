@@ -1,5 +1,5 @@
 from utils import setup_logger, generate_execution_id
-from tasks import load_excel_to_staging
+from pipeline_dimensional_data.tasks import load_excel_to_staging
 
 logger = setup_logger()
 

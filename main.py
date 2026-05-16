@@ -1,5 +1,5 @@
 import argparse
-from flow import DimensionalDataFlow
+from pipeline_dimensional_data.flow import DimensionalDataFlow
 
 
 def parse_arguments():
