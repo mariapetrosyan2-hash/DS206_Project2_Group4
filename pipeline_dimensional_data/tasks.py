@@ -79,6 +79,32 @@ def update_dimension_tables():
         return {"success": False, "task": "update_dimension_tables", "error": str(e)}
 
 
+def update_fact_table(start_date=None, end_date=None):
+    file_path = os.path.join(
+        "pipeline_dimensional_data",
+        "queries",
+        "update_fact.sql"
+    )
+
+    try:
+        logger.info("Starting fact table update process")
+
+        connection = get_connection()
+        sql_script = read_sql_file(file_path)
+
+        logger.info("Executing fact update script")
+        execute_sql_script(connection, sql_script)
+
+        connection.close()
+
+        logger.info("Fact table update process completed successfully")
+        return {"success": True, "task": "update_fact_table"}
+
+    except Exception as e:
+        logger.error(f"Error updating fact table: {e}")
+        return {"success": False, "task": "update_fact_table", "error": str(e)}
+
+
 def load_excel_to_staging():
     try:
         logger.info("Starting Excel load process")
