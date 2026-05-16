@@ -28,6 +28,10 @@ def test_setup_logger_returns_logging_module():
 def test_get_connection_success(mock_config_parser, mock_pyodbc_connect):
     mock_config = MagicMock()
 
+    # This is needed because parse_sql_server_config checks:
+    # if "sql_server" not in config
+    mock_config.__contains__.return_value = True
+
     mock_config.__getitem__.return_value = {
         "server": "localhost",
         "database": "ORDER_DDS",
@@ -48,21 +52,27 @@ def test_get_connection_success(mock_config_parser, mock_pyodbc_connect):
 @patch("utils.configparser.ConfigParser")
 def test_get_connection_missing_sql_server_section(mock_config_parser):
     mock_config = MagicMock()
-    mock_config.__getitem__.side_effect = KeyError("sql_server")
+
+    # Simulates a config file without [sql_server]
+    mock_config.__contains__.return_value = False
 
     mock_config_parser.return_value = mock_config
 
     try:
         get_connection()
         assert False
-    except KeyError:
-        assert True
+    except KeyError as error:
+        assert "Missing [sql_server] section" in str(error)
 
 
 @patch("utils.pyodbc.connect")
 @patch("utils.configparser.ConfigParser")
 def test_get_connection_database_error(mock_config_parser, mock_pyodbc_connect):
     mock_config = MagicMock()
+
+    # This is needed because parse_sql_server_config checks:
+    # if "sql_server" not in config
+    mock_config.__contains__.return_value = True
 
     mock_config.__getitem__.return_value = {
         "server": "localhost",
