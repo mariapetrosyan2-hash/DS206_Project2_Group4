@@ -1,8 +1,8 @@
 import pyodbc
 import configparser
-import logging
 import os
 import uuid
+import importlib.util
 
 
 def read_sql_file(file_path):
@@ -68,18 +68,22 @@ def execute_sql_script(connection, sql_script):
     return {"success": True}
 
 
-def setup_logger():
+def setup_logger(execution_id=None):
     """
-    Sets up the logger for the dimensional data pipeline.
+    Loads the project logging.py file and returns a logger
+    for the dimensional data pipeline.
     """
-    logging.basicConfig(
-        filename="logs/logs_dimensional_data_pipeline.txt",
-        level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(message)s"
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    logging_file_path = os.path.join(base_dir, "logging.py")
+
+    spec = importlib.util.spec_from_file_location(
+        "project_logging",
+        logging_file_path
     )
+    project_logging = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(project_logging)
 
-    return logging
-
+    return project_logging.setup_dimensional_logger(execution_id)
 
 def generate_execution_id():
     """
