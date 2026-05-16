@@ -2,7 +2,8 @@ from utils import setup_logger, generate_execution_id
 from pipeline_dimensional_data.tasks import (
     create_staging_tables,
     create_dimensional_tables,
-    load_excel_to_staging
+    load_excel_to_staging,
+    update_dimension_tables
 )
 
 
@@ -49,6 +50,18 @@ class DimensionalDataFlow:
             return staging_load_result
 
         logger.info(f"[{self.execution_id}] Excel data loaded into staging successfully")
+
+        dimension_update_result = update_dimension_tables()
+
+        if not dimension_update_result["success"]:
+            logger.error(
+                f"[{self.execution_id}] Pipeline failed at update_dimension_tables: "
+                f"{dimension_update_result['error']}"
+            )
+            return dimension_update_result
+
+        logger.info(f"[{self.execution_id}] Dimension tables updated successfully")
+
         logger.info(f"[{self.execution_id}] Pipeline completed successfully")
 
         return {"success": True, "execution_id": self.execution_id}

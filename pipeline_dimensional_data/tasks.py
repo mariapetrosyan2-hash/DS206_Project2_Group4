@@ -43,6 +43,42 @@ def create_dimensional_tables():
     return run_sql_file(file_path, "create_dimensional_tables")
 
 
+def update_dimension_tables():
+    query_folder = os.path.join("pipeline_dimensional_data", "queries")
+
+    dimension_scripts = [
+        "update_dim_categories.sql",
+        "update_dim_customers.sql",
+        "update_dim_employees.sql",
+        "update_dim_region.sql",
+        "update_dim_suppliers.sql",
+        "update_dim_shippers.sql",
+        "update_dim_territories.sql",
+        "update_dim_products.sql"
+    ]
+
+    try:
+        logger.info("Starting dimension table update process")
+
+        connection = get_connection()
+
+        for script_name in dimension_scripts:
+            file_path = os.path.join(query_folder, script_name)
+            sql_script = read_sql_file(file_path)
+
+            logger.info(f"Executing dimension update script: {script_name}")
+            execute_sql_script(connection, sql_script)
+
+        connection.close()
+
+        logger.info("Dimension table update process completed successfully")
+        return {"success": True, "task": "update_dimension_tables"}
+
+    except Exception as e:
+        logger.error(f"Error updating dimension tables: {e}")
+        return {"success": False, "task": "update_dimension_tables", "error": str(e)}
+
+
 def load_excel_to_staging():
     try:
         logger.info("Starting Excel load process")
