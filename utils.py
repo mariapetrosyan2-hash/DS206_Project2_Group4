@@ -60,9 +60,28 @@ def get_connection():
 def execute_sql_script(connection, sql_script):
     """
     Executes a SQL script using the provided database connection.
+    Supports SQL Server scripts that contain GO batch separators.
     """
     cursor = connection.cursor()
-    cursor.execute(sql_script)
+
+    batches = []
+    current_batch = []
+
+    for line in sql_script.splitlines():
+        if line.strip().upper() == "GO":
+            if current_batch:
+                batches.append("\n".join(current_batch))
+                current_batch = []
+        else:
+            current_batch.append(line)
+
+    if current_batch:
+        batches.append("\n".join(current_batch))
+
+    for batch in batches:
+        if batch.strip():
+            cursor.execute(batch)
+
     connection.commit()
 
     return {"success": True}
