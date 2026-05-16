@@ -4,7 +4,8 @@ from pipeline_dimensional_data.tasks import (
     create_dimensional_tables,
     load_excel_to_staging,
     update_dimension_tables,
-    update_fact_table
+    update_fact_table,
+    update_fact_error_table
 )
 
 
@@ -73,6 +74,17 @@ class DimensionalDataFlow:
             return fact_update_result
 
         logger.info(f"[{self.execution_id}] Fact table updated successfully")
+
+        fact_error_update_result = update_fact_error_table(start_date, end_date)
+
+        if not fact_error_update_result["success"]:
+            logger.error(
+                f"[{self.execution_id}] Pipeline failed at update_fact_error_table: "
+                f"{fact_error_update_result['error']}"
+            )
+            return fact_error_update_result
+
+        logger.info(f"[{self.execution_id}] Fact error table updated successfully")
 
         logger.info(f"[{self.execution_id}] Pipeline completed successfully")
 
