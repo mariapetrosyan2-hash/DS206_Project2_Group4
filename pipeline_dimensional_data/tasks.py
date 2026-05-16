@@ -1,6 +1,7 @@
 import pandas as pd
 from utils import get_connection, setup_logger
 
+
 logger = setup_logger()
 
 

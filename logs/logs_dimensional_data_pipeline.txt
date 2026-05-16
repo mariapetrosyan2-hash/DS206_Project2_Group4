@@ -97,3 +97,18 @@
 2026-05-16 11:43:21,449 - INFO - Excel load completed successfully
 2026-05-16 11:43:21,449 - INFO - [b39d6c5e-fc71-4461-a9f2-f00e4602eed6] Staging task completed successfully
 2026-05-16 11:43:21,449 - INFO - [b39d6c5e-fc71-4461-a9f2-f00e4602eed6] Pipeline completed successfully
+2026-05-16 12:26:45,458 - INFO - [cff0eaa8-76b9-4613-91a7-f6d4335c4e21] Pipeline started
+2026-05-16 12:26:45,458 - INFO - [cff0eaa8-76b9-4613-91a7-f6d4335c4e21] Start date: 2026-01-01, End date: 2026-12-31
+2026-05-16 12:26:45,458 - INFO - Starting Excel load process
+2026-05-16 12:26:45,461 - ERROR - Error loading Excel data: ('01000', "[01000] [unixODBC][Driver Manager]Can't open lib 'ODBC Driver 17 for SQL Server' : file not found (0) (SQLDriverConnect)")
+2026-05-16 12:26:45,461 - ERROR - [cff0eaa8-76b9-4613-91a7-f6d4335c4e21] Pipeline failed: ('01000', "[01000] [unixODBC][Driver Manager]Can't open lib 'ODBC Driver 17 for SQL Server' : file not found (0) (SQLDriverConnect)")
+2026-05-16 12:28:14,410 - INFO - [39cf9655-b2a7-4532-892c-69e622379b01] Pipeline started
+2026-05-16 12:28:14,411 - INFO - [39cf9655-b2a7-4532-892c-69e622379b01] Start date: 2026-01-01, End date: 2026-12-31
+2026-05-16 12:28:14,411 - INFO - Starting Excel load process
+2026-05-16 12:28:14,413 - ERROR - Error loading Excel data: ('01000', "[01000] [unixODBC][Driver Manager]Can't open lib 'ODBC Driver 17 for SQL Server' : file not found (0) (SQLDriverConnect)")
+2026-05-16 12:28:14,413 - ERROR - [39cf9655-b2a7-4532-892c-69e622379b01] Pipeline failed: ('01000', "[01000] [unixODBC][Driver Manager]Can't open lib 'ODBC Driver 17 for SQL Server' : file not found (0) (SQLDriverConnect)")
+2026-05-16 12:28:59,088 - INFO - [faf4d97b-423e-4f41-ae9f-f21ad1407966] Pipeline started
+2026-05-16 12:28:59,088 - INFO - [faf4d97b-423e-4f41-ae9f-f21ad1407966] Start date: 2026-01-01, End date: 2026-12-31
+2026-05-16 12:28:59,088 - INFO - Starting Excel load process
+2026-05-16 12:28:59,092 - ERROR - Error loading Excel data: ('01000', "[01000] [unixODBC][Driver Manager]Can't open lib 'ODBC Driver 17 for SQL Server' : file not found (0) (SQLDriverConnect)")
+2026-05-16 12:28:59,092 - ERROR - [faf4d97b-423e-4f41-ae9f-f21ad1407966] Pipeline failed: ('01000', "[01000] [unixODBC][Driver Manager]Can't open lib 'ODBC Driver 17 for SQL Server' : file not found (0) (SQLDriverConnect)")

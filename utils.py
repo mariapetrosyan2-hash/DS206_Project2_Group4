@@ -7,7 +7,7 @@ import os
 def get_connection():
     config = configparser.ConfigParser()
 
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    base_dir = os.path.dirname(os.path.abspath(__file__))
     config_path = os.path.join(base_dir, "infrastructure_initiation", "sql_server_config.cfg")
 
     config.read(config_path)
